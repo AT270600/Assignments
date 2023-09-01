@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+    <style>
+        .timer {
+            display: inline; /* Ensure the timer is initially visible */
+        }
+    </style>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <form method="POST" action="/add">
+        <input type="text" name="task" placeholder="Add a task" required>
+        <button type="submit">Add</button>
+    </form>
+    <ul>
+        {% for task in tasks %}
+            <li>
+                <span class="task">{{ task }}</span>
+                <!-- No need for start and stop buttons -->
+                <span class="timer">00:00</span>
+            </li>
+        {% endfor %}
+    </ul>
+   <script>
+    const timerElements = document.querySelectorAll(".timer");
+    const taskElements = document.querySelectorAll(".task");
+
+    let timers = [];
+
+    function updateTimers() {
+        timers.forEach((timer, index) => {
+            if (timer.isRunning) {
+                const currentTime = Math.floor((Date.now() - timer.startTime) / 1000);
+                timerElements[index].textContent = formatTime(currentTime);
+            }
+        });
+    }
+
+    function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        seconds = seconds % 60;
+        return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    taskElements.forEach((task, index) => {
+        task.addEventListener("click", () => {
+            if (timers[index] && timers[index].isRunning) {
+                timers[index].isRunning = false; // Stop the timer when the task is clicked
+            } else {
+                if (!timers[index]) {
+                    timers[index] = { startTime: Date.now(), isRunning: true };
+                } else {
+                    timers[index].isRunning = true; // Resume the timer
+                }
+            }
+        });
+
+        // Automatically start the timer when the task is entered
+        task.addEventListener("mouseenter", () => {
+            if (!timers[index] || !timers[index].isRunning) {
+                timers[index] = { startTime: Date.now(), isRunning: true };
+            }
+        });
+    });
+
+    setInterval(updateTimers, 1000);
+</script>
+
+
+
+
+</body>
+</html>
